@@ -12,14 +12,14 @@ async function main() {
 }
 main().catch(err => console.log(err))
 
-const tasksRouter = require('./routes/index')
-const userRouter = require('./routes/users/index')
+const cardRouter = require('./routes/cards')
+const userRouter = require('./routes/users')
 
 app.use(cors())
 app.use(express.urlencoded({extended: true}));
 app.use(express.json())
 
-app.use('/cards', tasksRouter)
+app.use('/cards', cardRouter)
 app.use('/user', userRouter)
 
 
