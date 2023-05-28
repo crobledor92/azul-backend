@@ -1,10 +1,11 @@
 const User = require('../models/card.model.jsx')
 
-const path = require('path');
-const allCardsDirectory = path.join('data', 'allCards.json')
-const fs = require('fs');
-const jsonData = fs.readFileSync(allCardsDirectory);
-const allCardsData = JSON.parse(jsonData);
+//Lógica para traer el .json con la data de las cartas y parsearlo
+// const path = require('path');
+// const allCardsDirectory = path.join('data', 'allCards.json')
+// const fs = require('fs');
+// const jsonData = fs.readFileSync(allCardsDirectory);
+// const allCardsData = JSON.parse(jsonData);
 
 const createAllCardsSummary = (req, res) => {
     allCardsData.forEach(e => {
