@@ -1,8 +1,14 @@
 const express = require('express');
-const router = express.Router();
-const { createAllCardsSummary } = require('../../controllers/cardController.jsx')
+const cardsRouter = express.Router();
+const { createAllCardsSummary } = require('../../controllers/cardController')
 
-/* GET users listing. */
-router.post('/addAllCards', createAllCardsSummary);
 
-module.exports = router;
+cardsRouter.post('/addAllCards', createAllCardsSummary);
+
+cardsRouter.get('/', async function (req, res, next) {
+    const {data} = await axios.get('https://api.scryfall.com/cards/random')
+    console.log(data)
+    res.status(200).send(data)
+});
+
+module.exports = cardsRouter;

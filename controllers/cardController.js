@@ -1,4 +1,4 @@
-const User = require('../models/card.model.jsx')
+const User = require('../models/card.model')
 
 //Lógica para traer el .json con la data de las cartas y parsearlo
 // const path = require('path');
