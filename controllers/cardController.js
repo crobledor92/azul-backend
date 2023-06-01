@@ -9,6 +9,7 @@ const User = require('../models/card.model')
 
 const createAllCardsSummary = (req, res) => {
     allCardsData.forEach(e => {
+        if (e.image_uris && e.image_uris.small && e.image_uris.normal) {        
         Card.create([
             {
                 id_scryfall: e.id,
@@ -21,8 +22,10 @@ const createAllCardsSummary = (req, res) => {
                 set_name: e.set_name,
             }
         ])
-    })
-    
+        }else{
+        console.log('La carta no tiene la estructura de datos esperada:', e);
+          }
+    })    
 }
 
 module.exports = { createAllCardsSummary }

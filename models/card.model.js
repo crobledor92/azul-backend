@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const Schema = mongoose.Schema;
 
-const userSchema = new Schema({
+const cardSchema = new Schema({
     /* All these come from scryfall. */
     id_scryfall: {type: String, required: true},
     name: {type: String, required: true},
@@ -50,4 +50,4 @@ const userSchema = new Schema({
 
 
 
-module.exports = mongoose.model("Card", userSchema);
+module.exports = mongoose.model("Card", cardSchema);
