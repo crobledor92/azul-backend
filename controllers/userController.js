@@ -73,7 +73,7 @@ const createUser = async (req, res) => {
 
 const loginUser = async (req,res) => {
     const { userCredential, password } = req.body
-    
+
     //Check if Credential fields are filled
     if(userCredential == null || password == null ) { 
         return res.status(400).json({ error: "Ingrese nombre de usuario o email y contraseña" })
@@ -92,7 +92,7 @@ const loginUser = async (req,res) => {
     if (!loggingInUser.comparePassword(password)) {
         return res.status(400).json({ error: "La contraseña no es correcta" })
     } else {
-        return res.status(400).json({
+        return res.status(200).json({
             token: loggingInUser.generateJWT(),
             message: "Te has conectado correctamente"
         })
