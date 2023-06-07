@@ -5,19 +5,23 @@ const bcrypt = require('bcrypt');
 
 const createUser = async (req, res) => {
     
+    console.log(req.body)
     //Check all the required fields are filled
     const propertryNames = ["name", "surname", "birthdate", "email",  "username", "password"] //Required fields
     const keyValuesArray = Object.entries(req.body)
-    const emptyFields = {}
+    let emptyFields = false
         
     propertryNames.forEach(e => {
-        !keyValuesArray.flat(1).includes(e) ? emptyFields[e]='No recibido' : null
+        if (!keyValuesArray.flat(1).includes(e) || req.body.e == undefined) {
+             return emptyFields = true;
+        }
     })
 
-    if(Object.keys(emptyFields).length !== 0) {
-        return res.status(400).json({error: emptyFields})
+    if (emptyFields) {
+        return res.status(400).json({error:"Falta por rellenar algun campo requerido"})
     }
     
+
     // check if there is a user registered with this email or username
     const { email, username, password} = req.body
     const takenCredentials = {}
@@ -58,7 +62,7 @@ const createUser = async (req, res) => {
     const savedUser = await newUser.save()
     if(savedUser) {
         return res.status(201).json({
-            token: savedUser.generateJWT(), //JWT created through the User model method
+            token: await savedUser.generateJWT(), //JWT created through the User model method
             user: {
                 email: savedUser.email,
                 username: savedUser.username,
@@ -67,7 +71,9 @@ const createUser = async (req, res) => {
             message:"Usuario creado correctamente",
         })
     } else {
+        console.log("se retorna este ERROOOOOOOOOOOOOOOOOOOOR")
         return res.status(400).json({error: "Ha habido un error al crear un nuevo usuario", err})
+
     }
 }
 
@@ -93,7 +99,7 @@ const loginUser = async (req,res) => {
         return res.status(400).json({ error: "La contraseña no es correcta" })
     } else {
         return res.status(200).json({
-            token: loggingInUser.generateJWT(),
+            token: await loggingInUser.generateJWT(),
             message: "Te has conectado correctamente"
         })
     }
