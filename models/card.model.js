@@ -25,8 +25,6 @@ const cardSchema = new Schema({
         pauper: {type: String},
         vintage: {type: String},
         commander: {type: String},
-        premodern: {type: String},
-        predh: {type: String},
     },
     //set_id: {type: String, required: true},
     set: {type: String, required: true},
