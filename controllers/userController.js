@@ -5,20 +5,21 @@ const bcrypt = require('bcrypt');
 
 const createUser = async (req, res) => {
     
-    console.log(req.body)
+    console.log(req.body.name)
     //Check all the required fields are filled
-    const propertryNames = ["name", "surname", "birthdate", "email",  "username", "password"] //Required fields
+    const propertryNames = ["name", "birthdate", "email",  "username", "password"] //Required fields
     const keyValuesArray = Object.entries(req.body)
     let emptyFields = false
         
     propertryNames.forEach(e => {
-        if (!keyValuesArray.flat(1).includes(e) || req.body.e == undefined) {
+        if (!keyValuesArray.flat(1).includes(e) || req.body.e == "") {
+            console.log("llegamos hasta aquí")
              return emptyFields = true;
         }
     })
 
     if (emptyFields) {
-        return res.status(400).json({error:"Falta por rellenar algun campo requerido"})
+        return res.status(400).json({error: "Falta por rellenar algun campo requerido"})
     }
     
 
@@ -37,11 +38,11 @@ const createUser = async (req, res) => {
     })
     if(existingUser) {
         if(existingUser.email == email) {
-            takenCredentials.email="El email ya está registrado" } 
+            return res.status(400).json({error: "El email ya está registrado" }) 
+        }
         if(existingUser.username == username) {
-            takenCredentials.username="El usuario ya está cogido...prueba uno distinto"
-        } 
-        return res.status(400).json({error: takenCredentials})
+            return res.status(400).json({error: "El usuario ya está cogido...prueba uno distinto" })
+        }  
     } 
 
     const hashedPassword = bcrypt.hashSync(password, 10)
