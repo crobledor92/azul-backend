@@ -75,5 +75,31 @@ const getCardDetail = async function (req, res, next) {
     }
 };
 
-module.exports = { createAllCardsSummary, getCardDetail }
+const getRandomCards = async function (req, res, next) {
+  const count = parseInt(req.query.count) || 1; // Obtener el valor del parámetro count, si no se proporciona, se asume 1
+  const randomCards = await Card.aggregate([{ $sample: { size: count } }]);
+  
+  const cardData = randomCards.map(({ _id, name, image_uris }) => ({
+    _id: _id.toString(),
+    name,
+    normalImageUrl: image_uris.normal
+  }));
+  res.status(200).json(cardData);
+};
+
+const getSearchedCards = async function (req, res, next) {
+  const input = req.query.name
+  const regex = new RegExp(input, 'i')
+  console.log(regex)
+  const matchingCards = await Card.find({ name: { $regex: regex }})
+
+  if (matchingCards.length > 0) {
+    res.status(200).send(matchingCards)
+  } else {
+    res.status(400).send({error: 'ups, no hay resultados que coincidan'})
+  }
+  
+}
+
+module.exports = { createAllCardsSummary, getCardDetail, getRandomCards, getSearchedCards }
 

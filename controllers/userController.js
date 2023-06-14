@@ -91,19 +91,24 @@ const loginUser = async (req,res) => {
     })
 
     //Check if username/email is correct
-    if(!loggingInUser) { 
-        return res.status(400).json({ error: "El email o nombre de usuario no existe" })
-    }
+    if(!loggingInUser || !loggingInUser.comparePassword(password)) { 
+        return res.status(400).json({ error: "Las credenciales son incorrectas" })
+    } else {
+            return res.status(200).json({
+                token: await loggingInUser.generateJWT(),
+                message: "Te has conectado correctamente"
+            })
+        }
 
     //Check if password is correct
-    if (!loggingInUser.comparePassword(password)) {
-        return res.status(400).json({ error: "La contraseña no es correcta" })
-    } else {
-        return res.status(200).json({
-            token: await loggingInUser.generateJWT(),
-            message: "Te has conectado correctamente"
-        })
-    }
+    // if (!loggingInUser.comparePassword(password)) {
+    //     return res.status(400).json({ error: "La contraseña no es correcta" })
+    // } else {
+    //     return res.status(200).json({
+    //         token: await loggingInUser.generateJWT(),
+    //         message: "Te has conectado correctamente"
+    //     })
+    // }
 }
 
 const getProfile = (req, res) => {
