@@ -56,18 +56,13 @@ const getCardDetail = async function (req, res, next) {
         image_uris,
         legalities,
       };
-      
-      console.log('Detalles de la carta:', cardDetail);
-      res.status(200).json(cardDetail);
 
-      // Construir el objeto de respuesta con el id_scryfall de la carta
-      //const cardDetail = {
-        //id_scryfall: idScryfall, 
-        // Agregar más propiedades de la carta según tus necesidades
-      //};
-  
-      //res.status(200).json(cardDetail);
-      //console.log('Detalles de la carta:', cardDetail);
+      const matchingCards = await Card.find({ name: cardDetail.name })
+      
+      res.status(200).send({selectedCard: cardDetail, sameCards: matchingCards})
+      console.log('Detalles de la carta:', cardDetail);
+      console.log('las cartas iguales son:', matchingCards);
+
     } catch (error) {
       // Manejar errores de base de datos u otros errores
       console.error('Error al buscar los detalles de la carta:', error);
@@ -89,6 +84,7 @@ const getRandomCards = async function (req, res, next) {
 
 const getSearchedCards = async function (req, res, next) {
   const input = req.query.name
+  console.log(input)
   const regex = new RegExp(input, 'i')
   console.log(regex)
   const matchingCards = await Card.find({ name: { $regex: regex }})
@@ -98,7 +94,6 @@ const getSearchedCards = async function (req, res, next) {
   } else {
     res.status(400).send({error: 'ups, no hay resultados que coincidan'})
   }
-  
 }
 
 module.exports = { createAllCardsSummary, getCardDetail, getRandomCards, getSearchedCards }
