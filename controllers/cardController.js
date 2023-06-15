@@ -59,7 +59,7 @@ const getCardDetail = async function (req, res, next) {
 
       const matchingCards = await Card.find({ name: cardDetail.name })
       
-      res.status(200).send({selectedCard: cardDetail, sameCards: matchingCards})
+      res.status(200).send({selectedCardBack: cardDetail, sameCardsBack: matchingCards})
       console.log('Detalles de la carta:', cardDetail);
       console.log('las cartas iguales son:', matchingCards);
 
