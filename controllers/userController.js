@@ -38,10 +38,10 @@ const createUser = async (req, res) => {
     })
     if(existingUser) {
         if(existingUser.email == email) {
-            return res.status(400).json({error: "El email ya está registrado" }) 
+            return res.status(400).json({error: "El email ya estaba registrado" }) 
         }
         if(existingUser.username == username) {
-            return res.status(400).json({error: "El usuario ya está cogido...prueba uno distinto" })
+            return res.status(400).json({error: "El usuario ya estaba cogido...prueba uno distinto" })
         }  
     } 
 
@@ -111,13 +111,28 @@ const loginUser = async (req,res) => {
     // }
 }
 
-const getProfile = (req, res) => {
+const getProfile = async(req, res) => {
     const token = req.headers.authorization.split(" ")[1]
     console.log("El token es: ", token)
 
     //TODO: Se debe enviar la info necesaria del usuario que se mostrará en el perfil del usuario
     try {
         const decodedToken = jwt.verify(token, secret)
+        const userDataFromDecodedToken = decodedToken;
+        console.log('user data', 
+        userDataFromDecodedToken.email,
+        userDataFromDecodedToken.username
+        );
+        
+        const userDataFromMongoDBQuerry = await User.findOne({
+            $or: [{ email: userDataFromDecodedToken.email }, 
+                { username: userDataFromDecodedToken.username }
+            ],
+        });
+        // request a mongoDB de la data del usuario
+        
+        
+        return res.status(200).json({userDataFromMongoDBQuerry})
         console.log("el token decodeado es: ", decodedToken)
         return res.status(200).send("Has accedido correctamente")
     } catch(error) {
