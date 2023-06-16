@@ -113,11 +113,12 @@ const loginUser = async (req,res) => {
 
 const getProfile = (req, res) => {
     const token = req.headers.authorization.split(" ")[1]
+    console.log("El token es: ", token)
 
     //TODO: Se debe enviar la info necesaria del usuario que se mostrará en el perfil del usuario
     try {
         const decodedToken = jwt.verify(token, secret)
-        console.log(decodedToken)
+        console.log("el token decodeado es: ", decodedToken)
         return res.status(200).send("Has accedido correctamente")
     } catch(error) {
         console.log("Este es el error al verificar el token", error)
