@@ -1,6 +1,7 @@
 const User = require('../models/card.model')
 const Card = require('../models/card.model');
 const axios =require ('axios')
+const sellCard = require('../models/sellcard.model');
 
 
 //Lógica para traer el .json con la data de las cartas y parsearlo
@@ -9,7 +10,6 @@ const axios =require ('axios')
 // const fs = require('fs');
 // const jsonData = fs.readFileSync(allCardsDirectory);
 // const allCardsData = JSON.parse(jsonData);
-
 const createAllCardsSummary = (req, res) => {
     allCardsData.forEach(e => {
         if (e.image_uris && e.image_uris.small && e.image_uris.normal) {        
@@ -60,8 +60,8 @@ const getCardDetail = async function (req, res, next) {
       const matchingCards = await Card.find({ name: cardDetail.name })
       
       res.status(200).send({selectedCardBack: cardDetail, sameCardsBack: matchingCards})
-      console.log('Detalles de la carta:', cardDetail);
-      console.log('las cartas iguales son:', matchingCards);
+      //console.log('Detalles de la carta:', cardDetail);
+      //console.log('las cartas iguales son:', matchingCards);
 
     } catch (error) {
       // Manejar errores de base de datos u otros errores
@@ -84,9 +84,9 @@ const getRandomCards = async function (req, res, next) {
 
 const getSearchedCards = async function (req, res, next) {
   const input = req.query.name
-  console.log(input)
+  //console.log(input)
   const regex = new RegExp(input, 'i')
-  console.log(regex)
+  //console.log(regex)
   const matchingCards = await Card.find({ name: { $regex: regex }})
 
   if (matchingCards.length > 0) {
@@ -96,5 +96,27 @@ const getSearchedCards = async function (req, res, next) {
   }
 }
 
-module.exports = { createAllCardsSummary, getCardDetail, getRandomCards, getSearchedCards }
+
+const putOnSell = (req, res, next) => {
+     const sellCardData = req.body; // Obtener los datos enviados en la solicitud POST
+     console.log('sellCardData es: ',sellCardData)
+     sellCard.create([
+      {
+          id_scryfall: sellCardData.id_scryfall,
+          id_card: sellCardData.id_card,
+          name: sellCardData.name,
+          set_name: sellCardData.set_name,
+          lang: sellCardData.lang,
+          foil: sellCardData.foil,
+          status: sellCardData.status,
+          type_sell: sellCardData.type_sell,
+          price: sellCardData.price,
+          end_of_bid: sellCardData.end_of_bid, 
+          user_id: sellCardData.user_id,
+      }
+    ])
+};
+
+
+module.exports = { createAllCardsSummary, getCardDetail, getRandomCards, getSearchedCards, putOnSell}
 
