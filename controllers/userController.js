@@ -113,39 +113,53 @@ const loginUser = async (req,res) => {
 
 const getProfile = async(req, res) => {
     const token = req.headers.authorization.split(" ")[1]
-    console.log("El token es: ", token)
 
-    //TODO: Se debe enviar la info necesaria del usuario que se mostrará en el perfil del usuario
     try {
+        //Se verifica el token
         const decodedToken = jwt.verify(token, secret)
-        const userDataFromDecodedToken = decodedToken;
-        console.log('user data', 
-        userDataFromDecodedToken.email,
-        userDataFromDecodedToken.username
-        );
+
+        // request a mongoDB de la data del usuario mediante el id del token decodeado
+        const {name, surname, birthdate, address, email, phone, username} = await User.findById(decodedToken.id);
         
-        const userDataFromMongoDBQuerry = await User.findOne({
-            $or: [{ email: userDataFromDecodedToken.email }, 
-                { username: userDataFromDecodedToken.username }
-            ],
-        });
-        // request a mongoDB de la data del usuario
+        //Se guarda la info necesaria en un objeto que se pasa al response
+        const userData = {name, surname, birthdate, address, email, phone, username}
+        return res.status(200).json(userData)
         
-        
-        return res.status(200).json({userDataFromMongoDBQuerry})
-        console.log("el token decodeado es: ", decodedToken)
-        return res.status(200).send("Has accedido correctamente")
     } catch(error) {
         console.log("Este es el error al verificar el token", error)
         res.status(400).send(error)
     }
-    
+}
 
+const modifyUser = async (req, res) => {
+
+    console.log("El body es, ", req.body)
     
+    const token = req.headers.authorization.split(" ")[1]
+    const decodedToken = jwt.verify(token, secret)
+
+    const { name, surname, birthdate, address, email, phone, username} = req.body
+    
+    User.findByIdAndUpdate(
+        decodedToken.id,
+        {
+            $set: { name: name, surname, birthdate, address, email, phone, username }
+        },
+        {
+            new: true
+        }
+    )
+    .then(updatedStudent => {
+        console.log("el usuario modificado es", updatedStudent)
+        const { name, surname, birthdate, address, email, phone, username} = updatedStudent
+        const updatedData =  { name, surname, birthdate, address, email, phone, username}
+        res.status(200).send(updatedData)
+    })
+    .catch(err => {
+        console.log("Err durante la modificación del usuario", err)
+        res.status(400).send(err)
+    })
     
 }
 
-        
-
-
-module.exports = { createUser, loginUser, getProfile }
+module.exports = { createUser, loginUser, getProfile, modifyUser }
