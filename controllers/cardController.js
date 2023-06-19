@@ -99,7 +99,7 @@ const getSearchedCards = async function (req, res, next) {
 
 const putOnSell = (req, res, next) => {
      const sellCardData = req.body; // Obtener los datos enviados en la solicitud POST
-     console.log('sellCardData es: ',sellCardData)
+     //console.log('sellCardData es: ',sellCardData)
      sellCard.create([
       {
           id_scryfall: sellCardData.id_scryfall,
@@ -117,6 +117,14 @@ const putOnSell = (req, res, next) => {
     ])
 };
 
+const getCardsOnSell = async function (req, res, next) {
+  const input = req.query.name
+  const matchingCards = await sellCard.find({name: input})
+  res.status(200).send(matchingCards)
+}
 
-module.exports = { createAllCardsSummary, getCardDetail, getRandomCards, getSearchedCards, putOnSell}
+
+
+
+module.exports = { createAllCardsSummary, getCardDetail, getRandomCards, getSearchedCards, putOnSell, getCardsOnSell}
 
