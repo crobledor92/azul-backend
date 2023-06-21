@@ -1,8 +1,8 @@
-const User = require('../models/card.model')
+const User = require('../models/user.model')
 const Card = require('../models/card.model');
 const axios =require ('axios')
 const sellCard = require('../models/sellcard.model');
-
+const { ObjectID } =require('mongoose')
 
 //Lógica para traer el .json con la data de las cartas y parsearlo
 // const path = require('path');
@@ -112,7 +112,7 @@ const putOnSell = (req, res) => {
           type_sell: sellCardData.type_sell,
           price: sellCardData.price,
           end_of_bid: sellCardData.end_of_bid, 
-          user_id: sellCardData.user_id,
+          user_id: req.decodedToken.id,
       }
     ])
     res.send("ok");
@@ -120,8 +120,23 @@ const putOnSell = (req, res) => {
 
 const getCardsOnSell = async function (req, res, next) {
   const input = req.query.name
-  const matchingCards = await sellCard.find({name: input})
-  res.status(200).send(matchingCards)
+  const matchingCards = await sellCard.find({name: input}).populate("user_id") //TODO populate
+
+  console.log("la carta es", matchingCards)
+
+  const matchingCardsWithUserName = matchingCards.map(async (card) => {
+    console.log("El user ID es", card.user_id)
+    const user = await User.findById(card.user_id)
+    console.log("El usuario es --------------------------------------------------------", user)
+    const matchingCardsAndName = {
+      ...card,
+      user_name: user.name,
+    }
+    return matchingCardsAndName
+  })
+  Promise.allSettled(matchingCardsWithUserName)
+  .then((results) => results.map((result) => result.value))
+  .then((results) => res.status(200).send(results))
 }
 
 

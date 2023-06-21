@@ -105,7 +105,7 @@ const getProfile = async(req, res) => {
     try {
   
         // request a mongoDB de la data del usuario mediante el id del token decodeado
-        const {name, surname, birthdate, address, email, phone, username, _id} = await User.findById(decodedToken.id);
+        const {name, surname, birthdate, address, email, phone, username, _id} = await User.findById(req.decodedToken.id);
         
         //Se guarda la info necesaria en un objeto que se pasa al response
         const userData = {name, surname, birthdate, address, email, phone, username, _id}
