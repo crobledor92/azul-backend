@@ -25,7 +25,6 @@ const createUser = async (req, res) => {
 
     // check if there is a user registered with this email or username
     const { email, username, password} = req.body
-    const takenCredentials = {}
     const existingUser = await User.findOne({
         $or: [
             {
@@ -90,7 +89,7 @@ const loginUser = async (req,res) => {
         $or: [{ email: userCredential }, { username: userCredential }] 
     })
 
-    //Check if username/email is correct
+    //Check if username/email and passwords is correct
     if(!loggingInUser || !loggingInUser.comparePassword(password)) { 
         return res.status(400).json({ error: "Las credenciales son incorrectas" })
     } else {
@@ -99,25 +98,12 @@ const loginUser = async (req,res) => {
                 message: "Te has conectado correctamente"
             })
         }
-
-    //Check if password is correct
-    // if (!loggingInUser.comparePassword(password)) {
-    //     return res.status(400).json({ error: "La contraseña no es correcta" })
-    // } else {
-    //     return res.status(200).json({
-    //         token: await loggingInUser.generateJWT(),
-    //         message: "Te has conectado correctamente"
-    //     })
-    // }
 }
 
 const getProfile = async(req, res) => {
-    const token = req.headers.authorization.split(" ")[1]
 
     try {
-        //Se verifica el token
-        const decodedToken = jwt.verify(token, secret)
-
+  
         // request a mongoDB de la data del usuario mediante el id del token decodeado
         const {name, surname, birthdate, address, email, phone, username, _id} = await User.findById(decodedToken.id);
         
@@ -141,17 +127,50 @@ const getProfile = async(req, res) => {
 
 const modifyUser = async (req, res) => {
 
-    console.log("El body es, ", req.body)
-    
-    const token = req.headers.authorization.split(" ")[1]
-    const decodedToken = jwt.verify(token, secret)
+    const userData = await User.findById(req.decodedToken.id)
 
-    const { name, surname, birthdate, address, email, phone, username} = req.body
+    //Comprobación de si ya existe un usuario con el username o email al que se está intentando cambiar
+
+    const { email, username} = req.body
+    const existingUser = await User.findOne({ 
+        $or: [
+            {
+                _id: { $ne: req.decodedToken.id}, 
+                email: email
+            },
+            {
+                _id: { $ne: req.decodedToken.id}, 
+                username: username
+            }
+        ]
+
+    })
+    if(existingUser) {
+        if(existingUser.email == email) {
+            return res.status(400).json({error: "El email ya estaba registrado" }) 
+        }
+        if(existingUser.username == username) {
+            return res.status(400).json({error: "El usuario ya estaba cogido...prueba uno distinto" })
+        }  
+    } 
+
+
+
+    //Se crea un objeto con los valores del body y si estos son undifined o null, los que ya existían 
+    const newDetails = {
+        name: req.body.name || userData.name,
+        surname: req.body.surname || userData.surname,
+        birthdate: req.body.birthdate || userData.birthdate,
+        address: req.body.address || userData.address,
+        email: req.body.email || userData.email,
+        phone: req.body.phone || userData.phone,
+        username: req.body.username || userData.username,
+    }
     
     User.findByIdAndUpdate(
-        decodedToken.id,
+        req.decodedToken.id,
         {
-            $set: { name: name, surname, birthdate, address, email, phone, username }
+            $set: newDetails
         },
         {
             new: true
@@ -170,4 +189,47 @@ const modifyUser = async (req, res) => {
     
 }
 
-module.exports = { createUser, loginUser, getProfile, modifyUser }
+const checkPsswd = async (req, res) => {
+
+    const user = await User.findById(req.decodedToken.id)
+
+    console.log("El user encontrado es", user)
+
+    const { oldPassword: password } = req.body
+
+    console.log(password)
+
+    if( !user.comparePassword(password)) { 
+        return res.status(400).json({ error: "Contraseña incorrecta" })
+    } else {
+        return res.status(200).json({
+            message: "La contraseña es correcta"
+        })
+    }
+}
+
+const modifyPsswd = async (req,res) => {
+
+    const { newPassword: password } = req.body
+
+    const hashedPassword = bcrypt.hashSync(password, 10)
+
+    User.findByIdAndUpdate(
+        req.decodedToken.id,
+        {
+            $set: { password: hashedPassword }
+        }
+    )
+    .then(updatedUser => {
+        res.status(200).send({messafe: "La contraseña se ha modificado correctamente"})
+    })
+    .catch(err => {
+        res.status(400).json({error: "Ha habido un error durante la modificación de de la contraseña"})
+})
+}
+
+
+
+
+
+module.exports = { createUser, loginUser, getProfile, modifyUser, checkPsswd, modifyPsswd }
