@@ -11,4 +11,6 @@ router.get('/profile', getProfile)
 
 router.put('/profile', modifyUser)
 
+//router.get('/username', getUserNameFromID)
+
 module.exports = router;

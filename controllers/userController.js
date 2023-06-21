@@ -119,10 +119,10 @@ const getProfile = async(req, res) => {
         const decodedToken = jwt.verify(token, secret)
 
         // request a mongoDB de la data del usuario mediante el id del token decodeado
-        const {name, surname, birthdate, address, email, phone, username} = await User.findById(decodedToken.id);
+        const {name, surname, birthdate, address, email, phone, username, _id} = await User.findById(decodedToken.id);
         
         //Se guarda la info necesaria en un objeto que se pasa al response
-        const userData = {name, surname, birthdate, address, email, phone, username}
+        const userData = {name, surname, birthdate, address, email, phone, username, _id}
         return res.status(200).json(userData)
         
     } catch(error) {
@@ -130,6 +130,14 @@ const getProfile = async(req, res) => {
         res.status(400).send(error)
     }
 }
+//// funcion para obtener el nombre de usuario a partir de su ID
+/*const getUserNameFromID = async (req, next) => {    
+    const userid = req.query.user_id; 
+    const nameToGet = await User.find({_id: userid});
+    //const username2 = nameToGet[0].username
+    console.log ('username es: ', nameToGet[0].username)
+    return (nameToGet[0].username)
+}*/
 
 const modifyUser = async (req, res) => {
 

@@ -97,7 +97,7 @@ const getSearchedCards = async function (req, res, next) {
 }
 
 
-const putOnSell = (req, res, next) => {
+const putOnSell = (req, res) => {
      const sellCardData = req.body; // Obtener los datos enviados en la solicitud POST
      //console.log('sellCardData es: ',sellCardData)
      sellCard.create([
@@ -115,7 +115,8 @@ const putOnSell = (req, res, next) => {
           user_id: sellCardData.user_id,
       }
     ])
-};
+    res.send("ok");
+  };
 
 const getCardsOnSell = async function (req, res, next) {
   const input = req.query.name
