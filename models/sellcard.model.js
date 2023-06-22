@@ -17,8 +17,7 @@ const sellCardSchema = new Schema({
     type_sell: {type: String, required: false},
     price: {type: String, required: false},
     end_of_bid: {type: String, required: false},
-    //TODO: cambiar a object id
-    user_id: {type: String, required: false},
+    user: { type: Schema.Types.ObjectId, ref: "User", required: true }, 
 },
     {timestamps: true}
 );

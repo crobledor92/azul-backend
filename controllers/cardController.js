@@ -2,7 +2,8 @@ const User = require('../models/user.model')
 const Card = require('../models/card.model');
 const axios =require ('axios')
 const sellCard = require('../models/sellcard.model');
-const { ObjectID } =require('mongoose')
+const { ObjectID } =require('mongoose');
+const { tokenValidator } = require('../middlewares/tokenValidator');
 
 //Lógica para traer el .json con la data de las cartas y parsearlo
 // const path = require('path');
@@ -97,9 +98,21 @@ const getSearchedCards = async function (req, res, next) {
 }
 
 
+const getCardsInCollections = async function (req, res, next) {
+  try{
+  const input = req.query.name;
+  const cardsInCollections = await Card.find({ name: input });
+  const collections = cardsInCollections.map(card => card.set_name);
+  res.status(200).send(collections)
+}catch{
+  res.status(400).send({error: 'Error al obtener las colecciones'})
+}
+}
+
+
+
 const putOnSell = (req, res) => {
-     const sellCardData = req.body; // Obtener los datos enviados en la solicitud POST
-     //console.log('sellCardData es: ',sellCardData)
+     const sellCardData = req.body; 
      sellCard.create([
       {
           id_scryfall: sellCardData.id_scryfall,
@@ -112,35 +125,20 @@ const putOnSell = (req, res) => {
           type_sell: sellCardData.type_sell,
           price: sellCardData.price,
           end_of_bid: sellCardData.end_of_bid, 
-          user_id: req.decodedToken.id,
+          user: sellCardData.user,
       }
     ])
     res.send("ok");
   };
 
 const getCardsOnSell = async function (req, res, next) {
-  const input = req.query.name
-  const matchingCards = await sellCard.find({name: input}).populate("user_id") //TODO populate
-
-  console.log("la carta es", matchingCards)
-
-  const matchingCardsWithUserName = matchingCards.map(async (card) => {
-    console.log("El user ID es", card.user_id)
-    const user = await User.findById(card.user_id)
-    console.log("El usuario es --------------------------------------------------------", user)
-    const matchingCardsAndName = {
-      ...card,
-      user_name: user.name,
-    }
-    return matchingCardsAndName
-  })
-  Promise.allSettled(matchingCardsWithUserName)
-  .then((results) => results.map((result) => result.value))
-  .then((results) => res.status(200).send(results))
+  const input = req.query.name;
+  const matchingCards = await sellCard.find({ name: input }).populate("user", "username");
+  res.status(200).send(matchingCards);
 }
 
 
 
 
-module.exports = { createAllCardsSummary, getCardDetail, getRandomCards, getSearchedCards, putOnSell, getCardsOnSell}
+module.exports = { createAllCardsSummary, getCardDetail, getRandomCards, getSearchedCards, putOnSell, getCardsOnSell, getCardsInCollections}
 
