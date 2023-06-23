@@ -44,19 +44,30 @@ const getCardDetail = async function (req, res, next) {
       const idScryfall = card.id_scryfall;
       // Obtenemos la carta con ese ID en la API de scryfall con todo su contenido
       const { data } = await axios.get(`https://api.scryfall.com/cards/${idScryfall}`);
-      // Extraemos los campos que vamos a usar en la vista de carta
-      const {name, oracle_text, set_name, rarity, colors, type_line, image_uris, legalities} = data;
-      // Construimos el objeto de respuesta con esos campos
-      const cardDetail ={
-        name,
-        oracle_text,
-        set_name,
-        rarity,
-        colors,
-        type_line,
-        image_uris,
-        legalities,
-      };
+
+         // Extraemos los campos que vamos a usar en la vista de carta
+        const {name, set_name, rarity, colors, image_uris, legalities, card_faces} = data;
+        // Construimos el objeto de respuesta con esos campos
+        let oracle_text, type_line;
+        if (card_faces && card_faces.length > 0) {
+          oracle_text = card_faces[0].oracle_text;
+          type_line = card_faces[0].type_line;
+        } else {
+          oracle_text = data.oracle_text;
+          type_line = data.type_line;
+        }
+                
+        const cardDetail ={
+          name,
+          oracle_text,
+          set_name,
+          rarity,
+          colors,
+          type_line,
+          image_uris,
+          legalities,
+        };
+      
 
       const matchingCards = await Card.find({ name: cardDetail.name })
       
@@ -70,6 +81,8 @@ const getCardDetail = async function (req, res, next) {
       res.status(500).json({ error: 'Error interno del servidor' });
     }
 };
+
+
 
 const getRandomCards = async function (req, res, next) {
   const count = parseInt(req.query.count) || 1; // Obtener el valor del parámetro count, si no se proporciona, se asume 1
