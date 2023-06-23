@@ -2,6 +2,8 @@ const jwt = require('jsonwebtoken');
 const secret = process.env.JWT_SECRET;
 
 const tokenValidator = async (req, res, next) => {
+
+    console.log("esta es la req", req.headers)
     const token = req.headers.authorization.split(" ")[1]
 
     jwt.verify(token, secret, function(err, decoded) {
@@ -11,6 +13,7 @@ const tokenValidator = async (req, res, next) => {
         } else {
             console.log("el token es------------------", decoded)
             req.decodedToken = decoded
+
             next()
         }
     })    

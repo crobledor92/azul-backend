@@ -4,6 +4,8 @@ const { createUser, loginUser, getProfile, modifyUser, checkPsswd, modifyPsswd }
 const { tokenValidator } = require('../../middlewares/tokenValidator')
 
 /* GET users listing. */
+router.get('/homepage', tokenValidator);
+
 router.post('/register', createUser);
 
 router.post('/login', loginUser)

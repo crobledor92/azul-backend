@@ -11,6 +11,7 @@ const UserSchema = new Schema({
     address: {type: String},
     email: {type: String, required: true, unique: true, trim: true},
     phone: {type: Number},
+    avatar_image:  {type: String},
     username: {type: String, required: true, unique: true, trim: true},
     password: {type: String, required: true},
     deletedAt: {type: Date},
