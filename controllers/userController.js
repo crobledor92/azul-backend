@@ -105,10 +105,10 @@ const getProfile = async(req, res) => {
     try {
   
         // request a mongoDB de la data del usuario mediante el id del token decodeado
-        const {name, surname, birthdate, address, email, phone, username, _id} = await User.findById(req.decodedToken.id);
+        const {name, surname, birthdate, address, email, phone, avatar_image, username, _id} = await User.findById(req.decodedToken.id);
         
         //Se guarda la info necesaria en un objeto que se pasa al response
-        const userData = {name, surname, birthdate, address, email, phone, username, _id}
+        const userData = {name, surname, birthdate, address, email, phone, avatar_image, username, _id}
         return res.status(200).json(userData)
         
     } catch(error) {
@@ -128,6 +128,8 @@ const getProfile = async(req, res) => {
 const modifyUser = async (req, res) => {
 
     const userData = await User.findById(req.decodedToken.id)
+
+    console.log("La req body recibida es", req.body)
 
     //Comprobación de si ya existe un usuario con el username o email al que se está intentando cambiar
 
@@ -164,6 +166,7 @@ const modifyUser = async (req, res) => {
         address: req.body.address || userData.address,
         email: req.body.email || userData.email,
         phone: req.body.phone || userData.phone,
+        avatar_image: req.body.avatar_image || userData.avatar_image,
         username: req.body.username || userData.username,
     }
     
@@ -178,8 +181,8 @@ const modifyUser = async (req, res) => {
     )
     .then(updatedStudent => {
         console.log("el usuario modificado es", updatedStudent)
-        const { name, surname, birthdate, address, email, phone, username} = updatedStudent
-        const updatedData =  { name, surname, birthdate, address, email, phone, username}
+        const { name, surname, birthdate, address, email, phone, avatar_image, username} = updatedStudent
+        const updatedData =  { name, surname, birthdate, address, email, phone, avatar_image, username}
         res.status(200).send(updatedData)
     })
     .catch(err => {
