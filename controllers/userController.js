@@ -95,6 +95,7 @@ const loginUser = async (req,res) => {
     } else {
             return res.status(200).json({
                 token: await loggingInUser.generateJWT(),
+                avatar_image: loggingInUser.avatar_image,
                 message: "Te has conectado correctamente"
             })
         }
