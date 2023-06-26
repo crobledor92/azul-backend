@@ -13,7 +13,6 @@ const tokenValidator = async (req, res, next) => {
         } else {
             console.log("el token es------------------", decoded)
             req.decodedToken = decoded
-
             next()
         }
     })    
