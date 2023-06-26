@@ -4,6 +4,7 @@ const axios =require ('axios')
 const sellCard = require('../models/sellcard.model');
 const { ObjectID } =require('mongoose');
 const { tokenValidator } = require('../middlewares/tokenValidator');
+const mongoose = require('mongoose');
 
 //Lógica para traer el .json con la data de las cartas y parsearlo
 // const path = require('path');
@@ -111,20 +112,20 @@ const getSearchedCards = async function (req, res, next) {
 }
 
 
-const getCardsInCollections = async function (req, res, next) {
-  try{
-  const input = req.query.name;
-  const cardsInCollections = await Card.find({ name: input });
-  const collections = cardsInCollections.map(card => card.set_name);
-  res.status(200).send(collections)
-}catch{
-  res.status(400).send({error: 'Error al obtener las colecciones'})
-}
-}
+  const getCardsInCollections = async function (req, res, next) {
+    try{
+    const input = req.query.name;
+    const cardsInCollections = await Card.find({ name: input });
+    const collections = cardsInCollections.map(card => card.set_name);
+    res.status(200).send(collections)
+    }catch{
+    res.status(400).send({error: 'Error al obtener las colecciones'})
+    }
+  }
 
 
 
-const putOnSell = (req, res) => {
+  const putOnSell = (req, res) => {
      const sellCardData = req.body; 
      sellCard.create([
       {
@@ -144,14 +145,43 @@ const putOnSell = (req, res) => {
     res.send("ok");
   };
 
-const getCardsOnSell = async function (req, res, next) {
-  const input = req.query.name;
-  const matchingCards = await sellCard.find({ name: input }).populate("user", "username");
-  res.status(200).send(matchingCards);
-}
+
+
+  const { ObjectId } = mongoose.Types;
+  const buyCard = (req, res) => {
+    const selledCardData = req.body;
+    const cardId = new ObjectId(selledCardData._id); // Convertir a ObjectId  
+    sellCard.updateOne(
+      { _id: cardId },
+      {
+        $set: {
+          buyer: selledCardData.buyer,
+        },
+      }
+    )
+      .then(() => {
+        res.send("ok");
+      })
+      .catch((error) => {
+        console.log("Error al actualizar la carta:", error);
+        res.status(500).send("Error al actualizar la carta");
+      });
+  };
+  
+
+  const getCardsOnSell = async function (req, res, next) {
+    const input = req.query.name;
+    const matchingCards = await sellCard.find({  
+      $and: [
+      { name: input },
+      { buyer: { $exists: false } }
+      ]
+  }).populate("user", "username");
+    res.status(200).send(matchingCards);
+  } 
 
 
 
 
-module.exports = { createAllCardsSummary, getCardDetail, getRandomCards, getSearchedCards, putOnSell, getCardsOnSell, getCardsInCollections}
+module.exports = { createAllCardsSummary, getCardDetail, getRandomCards, getSearchedCards, putOnSell, getCardsOnSell, getCardsInCollections, buyCard}
 
