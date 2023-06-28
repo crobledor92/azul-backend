@@ -57,6 +57,7 @@ const createUser = async (req, res) => {
             username: req.body.username,
             password: hashedPassword,
             deletedAt: req.body.deletedAt,
+            avatar_image: "undefined",
         }
     )
     const savedUser = await newUser.save()
