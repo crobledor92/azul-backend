@@ -19,6 +19,8 @@ const sellCardSchema = new Schema({
     end_of_bid: {type: String, required: false},
     user: { type: Schema.Types.ObjectId, ref: "User", required: true }, 
     buyer: { type: Schema.Types.ObjectId, ref: "User", required: false }, 
+    on_cart: { type: Schema.Types.ObjectId, ref: "User", required: false },
+
 },
     {timestamps: true}
 );

@@ -15,6 +15,8 @@ const UserSchema = new Schema({
     username: {type: String, required: true, unique: true, trim: true},
     password: {type: String, required: true},
     deletedAt: {type: Date},
+    on_cart: [{ type: Schema.Types.ObjectId, ref: "sellCard", required: false }],
+
     },
     {timestamps: true}
 );

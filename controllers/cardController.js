@@ -148,6 +148,7 @@ const getSearchedCards = async function (req, res, next) {
 
 
   const { ObjectId } = mongoose.Types;
+
   const buyCard = (req, res) => {
     const selledCardData = req.body;
     const cardId = new ObjectId(selledCardData._id); // Convertir a ObjectId  
@@ -159,7 +160,7 @@ const getSearchedCards = async function (req, res, next) {
         },
       }
     )
-      .then(() => {
+     .then(() => {
         res.send("ok");
       })
       .catch((error) => {
@@ -167,6 +168,42 @@ const getSearchedCards = async function (req, res, next) {
         res.status(500).send("Error al actualizar la carta");
       });
   };
+
+
+  const onCartCard = async (req, res) => {
+  try {
+    const onCartCardData = req.body;
+    const cardId = new ObjectId(onCartCardData._id);
+    const userId = new ObjectId(onCartCardData.onCart);
+
+    console.log("-----------------cardID es:", cardId),
+    console.log("-----------------userId es:", userId),
+
+    await sellCard.updateOne(
+      { _id: cardId },
+      {
+        $set: {
+          on_cart: onCartCardData.onCart,
+        },
+      }
+    );
+
+    await User.updateOne(
+      { _id: userId },
+      {
+        $push: {
+          on_cart: cardId,
+        },
+      }
+    );
+
+    res.send("ok");
+  } catch (error) {
+    console.log("Error al actualizar la carta:", error);
+    res.status(500).send("Error al actualizar la carta");
+  }
+};
+
   
 
   const getCardsOnSell = async function (req, res, next) {
@@ -174,7 +211,10 @@ const getSearchedCards = async function (req, res, next) {
     const matchingCards = await sellCard.find({  
       $and: [
       { name: input },
-      { buyer: { $exists: false } }
+      {  $nor: [
+        { buyer: { $exists: true } },
+        { on_cart: { $exists: true } }
+      ] }
       ]
   }).populate("user", "username");
     res.status(200).send(matchingCards);
@@ -183,5 +223,6 @@ const getSearchedCards = async function (req, res, next) {
 
 
 
-module.exports = { createAllCardsSummary, getCardDetail, getRandomCards, getSearchedCards, putOnSell, getCardsOnSell, getCardsInCollections, buyCard}
+module.exports = { createAllCardsSummary, getCardDetail, getRandomCards, getSearchedCards, putOnSell, getCardsOnSell, getCardsInCollections, buyCard, onCartCard}
+
 

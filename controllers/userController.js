@@ -106,10 +106,10 @@ const getProfile = async(req, res) => {
     try {
   
         // request a mongoDB de la data del usuario mediante el id del token decodeado
-        const {name, surname, birthdate, address, email, phone, avatar_image, username, _id} = await User.findById(req.decodedToken.id);
+        const {name, surname, birthdate, address, email, phone, avatar_image, username, _id, on_cart} = await User.findById(req.decodedToken.id);
         
         //Se guarda la info necesaria en un objeto que se pasa al response
-        const userData = {name, surname, birthdate, address, email, phone, avatar_image, username, _id}
+        const userData = {name, surname, birthdate, address, email, phone, avatar_image, username, _id, on_cart}
         return res.status(200).json(userData)
         
     } catch(error) {
@@ -231,7 +231,6 @@ const modifyPsswd = async (req,res) => {
         res.status(400).json({error: "Ha habido un error durante la modificación de de la contraseña"})
 })
 }
-
 
 
 
