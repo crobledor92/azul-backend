@@ -197,7 +197,9 @@ const getSearchedCards = async function (req, res, next) {
       }
     );
 
-    res.send("ok");
+    const user = await User.find({ _id: userId })
+    const cardsOnCart = user.on_cart
+    res.status(200).send({ message: "ok", cardsOnCart});
   } catch (error) {
     console.log("Error al actualizar la carta:", error);
     res.status(500).send("Error al actualizar la carta");
