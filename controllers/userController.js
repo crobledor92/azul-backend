@@ -2,6 +2,8 @@ const User = require('../models/user.model')
 const jwt = require('jsonwebtoken');
 const secret = process.env.JWT_SECRET;
 const bcrypt = require('bcrypt');
+const { welcomeEmail } = require('../services/email')
+const SibApiV3Sdk = require('sib-api-v3-sdk');
 
 const createUser = async (req, res) => {
     
@@ -62,6 +64,13 @@ const createUser = async (req, res) => {
     )
     const savedUser = await newUser.save()
     if(savedUser) {
+        SibApiV3Sdk.ApiClient.instance.authentications['api-key'].apiKey = process.env.BREVO_API_TOKEN;
+        new SibApiV3Sdk.TransactionalEmailsApi().sendTransacEmail(welcomeEmail(savedUser.name, savedUser.email))
+        .then(function(data) {
+            console.log(data);
+        }, function(error) {
+            console.error(error);
+        });
         return res.status(201).json({
             token: await savedUser.generateJWT(), //JWT created through the User model method
             user: {
