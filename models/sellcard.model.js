@@ -20,6 +20,11 @@ const sellCardSchema = new Schema({
     user: { type: Schema.Types.ObjectId, ref: "User", required: true }, 
     buyer: { type: Schema.Types.ObjectId, ref: "User", required: false }, 
     on_cart: { type: Schema.Types.ObjectId, ref: "User", required: false },
+    bids: [{
+        price: { type: String, required: false },
+        user: { type: Schema.Types.ObjectId, ref: "User", required: false },
+        bid_date: {type: Date},
+    }]
 
 },
     {timestamps: true}

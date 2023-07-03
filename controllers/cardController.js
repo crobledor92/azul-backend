@@ -146,6 +146,38 @@ const getSearchedCards = async function (req, res, next) {
   };
 
 
+  
+  const bidUpCard = (req, res) => {
+    
+    const cardToBidData = req.body;
+    const cardId = cardToBidData.id_card
+    console.log("cardId es::::::::::", cardId)
+    console.log("price es::::::::::", cardToBidData.price)
+    console.log("user es::::::::::", cardToBidData.user)
+
+    sellCard.findOneAndUpdate(
+      { _id: cardId },
+      {
+        $push: {
+          bids: {
+            price: cardToBidData.price,
+            user: cardToBidData.user,
+          },
+        },
+      },
+      //{ new: true }
+    )
+    .then(() => {
+      res.send("ok");
+    })
+    .catch((error) => {
+      console.log("Error al actualizar la carta:", error);
+      res.status(500).send("Error al actualizar la carta");
+    });
+  }
+  
+
+
 
   const { ObjectId } = mongoose.Types;
 
@@ -225,6 +257,6 @@ const getSearchedCards = async function (req, res, next) {
 
 
 
-module.exports = { createAllCardsSummary, getCardDetail, getRandomCards, getSearchedCards, putOnSell, getCardsOnSell, getCardsInCollections, buyCard, onCartCard}
+module.exports = { createAllCardsSummary, getCardDetail, getRandomCards, getSearchedCards, putOnSell, getCardsOnSell, getCardsInCollections, buyCard, onCartCard, bidUpCard}
 
 
