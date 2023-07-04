@@ -111,7 +111,11 @@ const loginUser = async (req,res) => {
         }
 }
 
-const getProfile = async(req, res) => {
+const tokenValidatorRes = async (req,res) => {
+    res.status(200).send({message: "usuario logueado correctamente"})
+}
+
+const getUserData = async(req, res) => {
 
     try {
   
@@ -246,4 +250,4 @@ const modifyPsswd = async (req,res) => {
 
 
 
-module.exports = { createUser, loginUser, getProfile, modifyUser, checkPsswd, modifyPsswd }
+module.exports = { createUser, loginUser, tokenValidatorRes, getUserData, modifyUser, checkPsswd, modifyPsswd }
