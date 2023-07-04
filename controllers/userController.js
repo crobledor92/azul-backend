@@ -121,7 +121,6 @@ const getUserData = async(req, res) => {
   
         // request a mongoDB de la data del usuario mediante el id del token decodeado
         const allUserData = await User.findById(req.decodedToken.id).populate("on_cart");
-        console.log("all user data es::::::::::::::::::::", allUserData)
         const {name, surname, birthdate, address, email, phone, avatar_image, username, _id, on_cart} = allUserData        
         //Se guarda la info necesaria en un objeto que se pasa al response
         const userData = {name, surname, birthdate, address, email, phone, avatar_image, username, _id, on_cart}
