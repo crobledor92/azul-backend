@@ -147,14 +147,9 @@ const getSearchedCards = async function (req, res, next) {
 
 
   
-  const bidUpCard = (req, res) => {
-    
+  const bidUpCard = (req, res) => {    
     const cardToBidData = req.body;
     const cardId = cardToBidData.id_card
-    console.log("cardId es::::::::::", cardId)
-    console.log("price es::::::::::", cardToBidData.price)
-    console.log("user es::::::::::", cardToBidData.user)
-
     sellCard.findOneAndUpdate(
       { _id: cardId },
       {
@@ -164,8 +159,11 @@ const getSearchedCards = async function (req, res, next) {
             user: cardToBidData.user,
           },
         },
+          $set: {
+            price: cardToBidData.price,
+          },
+        
       },
-      //{ new: true }
     )
     .then(() => {
       res.send("ok");
