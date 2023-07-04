@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { createUser, loginUser, getProfile, modifyUser, checkPsswd, modifyPsswd } = require('../../controllers/userController')
+const { createUser, loginUser, tokenValidatorRes, getUserData, modifyUser, checkPsswd, modifyPsswd } = require('../../controllers/userController')
 const { tokenValidator } = require('../../middlewares/tokenValidator')
 
 /* GET users listing. */
@@ -8,9 +8,11 @@ router.get('/homepage', tokenValidator);
 
 router.post('/register', createUser);
 
-router.post('/login', loginUser)
+router.post('/login', loginUser);
 
-router.get('/profile', tokenValidator, getProfile)
+router.get('/userTokenValidation', tokenValidator, tokenValidatorRes)
+
+router.get('/getUserData', tokenValidator, getUserData)
 
 router.put('/profile/modify_details', tokenValidator, modifyUser)
 
