@@ -205,10 +205,6 @@ const getSearchedCards = async function (req, res, next) {
     const onCartCardData = req.body;
     const cardId = new ObjectId(onCartCardData._id);
     const userId = new ObjectId(onCartCardData.onCart);
-
-    console.log("-----------------cardID es:", cardId),
-    console.log("-----------------userId es:", userId),
-
     await sellCard.updateOne(
       { _id: cardId },
       {
@@ -253,8 +249,19 @@ const getSearchedCards = async function (req, res, next) {
   } 
 
 
+  ///////OBTENEMOS LAS CARTAS EXPIRADAS***** SEGUIR TRABAJANDO EN ELLO:
+  const getEndOfBidCards = async function (req, res) { 
+    const currentDate = new Date();
+  
+    const matchingCards = await sellCard.find({  
+      type_sell: "Subasta",
+      end_of_bid: { $lte: currentDate }
+    });
+    res.status(200).send(matchingCards);
+
+  }
 
 
-module.exports = { createAllCardsSummary, getCardDetail, getRandomCards, getSearchedCards, putOnSell, getCardsOnSell, getCardsInCollections, buyCard, onCartCard, bidUpCard}
+module.exports = { createAllCardsSummary, getCardDetail, getRandomCards, getSearchedCards, putOnSell, getCardsOnSell, getCardsInCollections, buyCard, onCartCard, bidUpCard, getEndOfBidCards}
 
 
