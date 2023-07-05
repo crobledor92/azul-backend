@@ -232,6 +232,72 @@ const getSearchedCards = async function (req, res, next) {
   }
 };
 
+  const deleteCardFromCart = async (req, res) => {
+    try {
+      const cardId = new ObjectId(req.body._id);
+      const userId = new ObjectId(req.decodedToken.id);
+      
+      await sellCard.updateOne(
+        { _id: cardId },
+        {
+          $unset: {
+            on_cart: userId,
+          },
+        }
+      );
+  
+      await User.updateOne(
+        { _id: userId },
+        {
+          $pull: {
+            on_cart: cardId,
+          },
+        }
+      );
+      res.status(200).send({ message: "ok" });
+    } catch (error) {
+      console.log("Error al eliminar una carta del carrito de usuario", error)
+      res.status(400).send("Error al eliminar la carta del carrito");
+    }
+  }
+
+  const buyCardsOnCart = async (req, res) => {
+    try {
+      const userId = new ObjectId(req.decodedToken.id);
+      const user = await User.findById(userId);
+      const userCart = user.on_cart 
+
+      userCart.forEach(async card => {
+        console.log(card)
+        await sellCard.updateOne(
+          { _id: card },
+          {
+            $set: {
+              buyer: userId,
+            },
+            $unset: {
+              on_cart: userId,
+            },
+          }
+        )
+
+        await User.updateOne(
+          { _id: userId },
+          {
+            $pull: {
+              on_cart: card,
+            },
+          }
+        )       
+      })  
+
+      res.status(200).send({message: "OK"})
+    } catch(error) {
+      console.log(error)
+      res.status(400).send({error: "Ha habido un error al comprar las cartas del carrito"})
+    }
+  }
+
   
 
   const getCardsOnSell = async function (req, res, next) {
@@ -262,6 +328,6 @@ const getSearchedCards = async function (req, res, next) {
   }
 
 
-module.exports = { createAllCardsSummary, getCardDetail, getRandomCards, getSearchedCards, putOnSell, getCardsOnSell, getCardsInCollections, buyCard, onCartCard, bidUpCard, getEndOfBidCards}
+module.exports = { createAllCardsSummary, getCardDetail, getRandomCards, getSearchedCards, putOnSell, getCardsOnSell, getCardsInCollections, buyCard, onCartCard, bidUpCard}
 
 
