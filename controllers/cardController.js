@@ -328,6 +328,6 @@ const getSearchedCards = async function (req, res, next) {
   }
 
 
-module.exports = { createAllCardsSummary, getCardDetail, getRandomCards, getSearchedCards, putOnSell, getCardsOnSell, getCardsInCollections, buyCard, onCartCard, bidUpCard, getEndOfBidCards, buyCardsOnCart, deleteCardFromCart}
+module.exports = { createAllCardsSummary, getCardDetail, getRandomCards, getSearchedCards, putOnSell, getCardsOnSell, getCardsInCollections, buyCard, onCartCard, bidUpCard, buyCardsOnCart, deleteCardFromCart, getEndOfBidCards}
 
 
