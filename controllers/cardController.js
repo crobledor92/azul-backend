@@ -2,8 +2,6 @@ const User = require('../models/user.model')
 const Card = require('../models/card.model');
 const axios =require ('axios')
 const sellCard = require('../models/sellcard.model');
-const { ObjectID } =require('mongoose');
-const { tokenValidator } = require('../middlewares/tokenValidator');
 const mongoose = require('mongoose');
 
 //Lógica para traer el .json con la data de las cartas y parsearlo

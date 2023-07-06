@@ -1,6 +1,4 @@
 const User = require('../models/user.model')
-const jwt = require('jsonwebtoken');
-const secret = process.env.JWT_SECRET;
 const bcrypt = require('bcrypt');
 const { welcomeEmail } = require('../services/email')
 const SibApiV3Sdk = require('sib-api-v3-sdk');
