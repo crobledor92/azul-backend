@@ -127,6 +127,7 @@ const getSearchedCards = async function (req, res, next) {
 
   const putOnSell = (req, res) => {
      const sellCardData = req.body; 
+     console.log('cardController.js 129 | sell card data', sellCardData);
      sellCard.create([
       {
           id_scryfall: sellCardData.id_scryfall,
@@ -140,6 +141,7 @@ const getSearchedCards = async function (req, res, next) {
           price: sellCardData.price,
           end_of_bid: sellCardData.end_of_bid, 
           user: sellCardData.user,
+          image: sellCardData.image
       }
     ])
     res.send("ok");
@@ -267,7 +269,7 @@ const getSearchedCards = async function (req, res, next) {
       const user = await User.findById(userId);
       const userCart = user.on_cart 
 
-      userCart.forEach(async card => {
+       const promises = userCart.map(async card => {
         console.log(card)
         await sellCard.updateOne(
           { _id: card },
@@ -290,7 +292,7 @@ const getSearchedCards = async function (req, res, next) {
           }
         )       
       })  
-
+      await Promise.allSettled(promises)
       res.status(200).send({message: "OK"})
     } catch(error) {
       console.log(error)
@@ -324,7 +326,6 @@ const getSearchedCards = async function (req, res, next) {
       end_of_bid: { $lte: currentDate }
     });
     res.status(200).send(matchingCards);
-
   }
 
 

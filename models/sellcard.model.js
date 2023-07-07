@@ -8,6 +8,7 @@ const sellCardSchema = new Schema({
     id_card: {type: String, required: false},
     name: {type: String, required: false},
     set_name: {type: String, required: false},
+    image: {type: Array, required: false},
 
 
     /* All these come from the user when puts a card on sell. */
