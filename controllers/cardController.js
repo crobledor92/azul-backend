@@ -125,6 +125,7 @@ const getSearchedCards = async function (req, res, next) {
 
   const putOnSell = (req, res) => {
      const sellCardData = req.body; 
+     console.log('cardController.js 129 | sell card data', sellCardData);
      sellCard.create([
       {
           id_scryfall: sellCardData.id_scryfall,
@@ -138,6 +139,7 @@ const getSearchedCards = async function (req, res, next) {
           price: sellCardData.price,
           end_of_bid: sellCardData.end_of_bid, 
           user: sellCardData.user,
+          image: sellCardData.image
       }
     ])
     res.send("ok");
