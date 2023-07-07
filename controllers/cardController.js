@@ -305,7 +305,9 @@ const getSearchedCards = async function (req, res, next) {
       { name: input },
       {  $nor: [
         { buyer: { $exists: true } },
-        { on_cart: { $exists: true } }
+        { on_cart: { $exists: true } },
+        { expired: { $exists: true } },
+
       ] }
       ]
   }).populate("user", "username");
@@ -314,16 +316,50 @@ const getSearchedCards = async function (req, res, next) {
 
 
   ///////OBTENEMOS LAS CARTAS EXPIRADAS***** SEGUIR TRABAJANDO EN ELLO:
-  const getEndOfBidCards = async function (req, res) { 
-    const currentDate = new Date();
+  const getEndOfBidCards = async function (req, res) {
+    //const currentDate = new Date();
   
-    const matchingCards = await sellCard.find({  
+    const matchingCards = await sellCard.find({
       type_sell: "Subasta",
-      end_of_bid: { $lte: currentDate }
+      //end_of_bid: { $lte: currentDate }
+      end_of_bid: "2023-07-06T22:00:00.000Z", // para probar, eliminar después y descomentar línea de arriba
+      buyer: { $exists: false },
+      expired: { $exists: false },
+      
     });
-    res.status(200).send(matchingCards);
-  }
+    for (const card of matchingCards) {
+      if (card.bids.length < 1) {
+        console.log("quitar la carta de venta");
+        await sellCard.updateOne(
+          { _id: card._id },
+          {
+            $set: {
+              expired: true,
+            },
+          }
+        );
+        
+      } else {
+        console.log("adjudicarla al mayor pujador");
+        const bidsAmount = card.bids.length - 1;
+         await sellCard.updateOne(
+            { _id: card._id },
+            {
+              $set: {
+                buyer: card.bids[bidsAmount].user,
+              },
+            }
+          );
+      //enviar email al comprador cuando la puja expire
+      
 
+
+      }
+    };
+  
+    res.status(200).send(matchingCards);
+  };
+  
 
 module.exports = { createAllCardsSummary, getCardDetail, getRandomCards, getSearchedCards, putOnSell, getCardsOnSell, getCardsInCollections, buyCard, onCartCard, bidUpCard, buyCardsOnCart, deleteCardFromCart, getEndOfBidCards}
 

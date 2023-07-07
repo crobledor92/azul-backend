@@ -24,7 +24,9 @@ const sellCardSchema = new Schema({
         price: { type: String, required: false },
         user: { type: Schema.Types.ObjectId, ref: "User", required: false },
         bid_date: {type: Date},
-    }]
+    }],
+    expired: {type: Boolean, required: false},
+
 
 },
     {timestamps: true}
