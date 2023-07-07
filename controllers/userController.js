@@ -1,4 +1,6 @@
 const User = require('../models/user.model')
+const Conversation = require('../models/conversation.model')
+const Message = require('../models/message.model')
 const bcrypt = require('bcrypt');
 const { welcomeEmail } = require('../services/email')
 const SibApiV3Sdk = require('sib-api-v3-sdk');
@@ -113,17 +115,19 @@ const tokenValidatorRes = async (req,res) => {
     res.status(200).send({message: "usuario logueado correctamente"})
 }
 
-const getUserData = async(req, res) => {
+const getUserData = async(req, res, next) => {
 
     try {
-  
         // request a mongoDB de la data del usuario mediante el id del token decodeado
         const allUserData = await User.findById(req.decodedToken.id).populate("on_cart");
-        const {name, surname, birthdate, address, email, phone, avatar_image, username, _id, on_cart} = allUserData        
+        const {name, surname, birthdate, address, email, phone, avatar_image, username, _id, on_cart} = allUserData  
+        
+        const allUserConversations = await Conversation.find()
         //Se guarda la info necesaria en un objeto que se pasa al response
         const userData = {name, surname, birthdate, address, email, phone, avatar_image, username, _id, on_cart}
-        return res.status(200).json(userData)
-        
+        req.userData = userData
+        next()
+        // return res.status(200).json(userData)
     } catch(error) {
         console.log("Este es el error al verificar el token", error)
         res.status(400).send(error)

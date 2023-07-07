@@ -53,7 +53,7 @@ const newMessage = async (req,res) => {
 const getMessages = async (req,res) => {
 
     try {
-    const userConversations = await Conversation.find({
+    let userConversations = await Conversation.find({
         $or: [
             {
                 interlocutor1: req.decodedToken.id,
@@ -62,17 +62,46 @@ const getMessages = async (req,res) => {
                 interlocutor2: req.decodedToken.id,
             }
         ]
-    })
+    }).populate( 'interlocutor1', ["username", "avatar_image"]).populate( 'interlocutor2', ["username", "avatar_image"])
 
+//     .populate({
+//         path    : 'users',
+//         populate: [
+//             { path: 'cars' },
+//             { path: 'houses' }
+//         ]
+//    });
+
+
+    console.log("las conversaciones con el username son", userConversations)
+    
+    const allMessages = []
     const promises = userConversations.map(async (conversation) => {
         const messages = await Message.find({conversation_id: conversation._id})
-
-        conversation = {...conversation, messages: messages}
-        return conversation
+        allMessages.push(messages)
     })
     await Promise.allSettled(promises)
 
-    res.status(200).send(userConversations)
+    // let unreadConversationsCount = 0
+    const userMessagesData = userConversations.map((conversation, index) => {
+        // let allMessagesRead = true
+        // const relatedMessages = allMessages[index]
+        // relatedMessages.forEach(message => !message.read ? allMessagesRead = false : null)
+        const conversationAndMessages = {
+            conversation,
+            messages: allMessages[index],
+            // read: allMessagesRead,
+        }
+        // !conversationAndMessages.read ? unreadConversationsCount++ : null
+        console.log("conversación completa", conversationAndMessages)
+        return conversationAndMessages
+    })
+    
+    const allUserData = {
+        userData: req.userData, 
+        userMessagesData,
+        }
+    res.status(200).send(allUserData)
 
     } catch(err) {
         console.log("Error al traer todas las conversaciones de un usuario", err)
