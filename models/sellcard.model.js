@@ -17,7 +17,7 @@ const sellCardSchema = new Schema({
     status: {type: String, required: false},
     type_sell: {type: String, required: false},
     price: {type: String, required: false, mutable: true},
-    end_of_bid: {type: String, required: false},
+    end_of_bid: {type: Date, required: false},
     user: { type: Schema.Types.ObjectId, ref: "User", required: true }, 
     buyer: { type: Schema.Types.ObjectId, ref: "User", required: false }, 
     on_cart: { type: Schema.Types.ObjectId, ref: "User", required: false },
