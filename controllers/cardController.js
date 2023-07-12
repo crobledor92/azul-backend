@@ -152,6 +152,7 @@ const getSearchedCards = async function (req, res, next) {
   
   const bidUpCard = (req, res) => {    
     const cardToBidData = req.body;
+    console.log(req.body)
     const cardId = cardToBidData.id_card
     sellCard.findOneAndUpdate(
       { _id: cardId },
