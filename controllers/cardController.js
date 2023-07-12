@@ -3,6 +3,9 @@ const Card = require('../models/card.model');
 const axios =require ('axios')
 const sellCard = require('../models/sellcard.model');
 const mongoose = require('mongoose');
+const { notSelledEmail,selledSellerEmail, selledBuyerEmail } = require('../services/email')
+const SibApiV3Sdk = require('sib-api-v3-sdk');
+
 
 //Lógica para traer el .json con la data de las cartas y parsearlo
 // const path = require('path');
@@ -317,14 +320,14 @@ const getSearchedCards = async function (req, res, next) {
   } 
 
 
-  ///////OBTENEMOS LAS CARTAS EXPIRADAS***** SEGUIR TRABAJANDO EN ELLO:
+  ///////OBTENEMOS LAS CARTAS EXPIRADAS***** 
   const getEndOfBidCards = async function (req, res) {
-    //const currentDate = new Date();
+    const currentDate = new Date();
   
     const matchingCards = await sellCard.find({
       type_sell: "Subasta",
-      //end_of_bid: { $lte: currentDate }
-      end_of_bid: "2023-07-06T22:00:00.000Z", // para probar, eliminar después y descomentar línea de arriba
+      end_of_bid: { $lte: currentDate },
+      //end_of_bid: "2023-07-11T22:00:00.000Z", // para probar, eliminar después y descomentar línea de arriba
       buyer: { $exists: false },
       expired: { $exists: false },
       
@@ -340,7 +343,12 @@ const getSearchedCards = async function (req, res, next) {
             },
           }
         );
-        
+        const populatedCard = await sellCard.findById(card._id).populate('user');
+        const userEmail = populatedCard.user.email;
+        const userName = populatedCard.user.username;
+        SibApiV3Sdk.ApiClient.instance.authentications['api-key'].apiKey = process.env.BREVO_API_DAVID;
+        new SibApiV3Sdk.TransactionalEmailsApi().sendTransacEmail(notSelledEmail(userName,userEmail))
+               
       } else {
         console.log("adjudicarla al mayor pujador");
         const bidsAmount = card.bids.length - 1;
@@ -352,10 +360,19 @@ const getSearchedCards = async function (req, res, next) {
               },
             }
           );
-      //enviar email al comprador cuando la puja expire
-      
+        const sellerInfo = await sellCard.findById(card._id).populate('user');
+        //console.log ("SellerInfoes:",sellerInfo)
+        const sellerEmail = sellerInfo.user.email;
+        const sellerName = sellerInfo.user.username;
+        SibApiV3Sdk.ApiClient.instance.authentications['api-key'].apiKey = process.env.BREVO_API_DAVID;
+        new SibApiV3Sdk.TransactionalEmailsApi().sendTransacEmail(selledSellerEmail(sellerName,sellerEmail))
 
-
+        const buyerInfo = await sellCard.findById(card._id).populate('buyer');
+        console.log("Buyerinfo es:", buyerInfo)
+        const buyerEmail = buyerInfo.buyer.email;
+        const buyerName = sellerInfo.buyer.username;
+        SibApiV3Sdk.ApiClient.instance.authentications['api-key'].apiKey = process.env.BREVO_API_DAVID;
+        new SibApiV3Sdk.TransactionalEmailsApi().sendTransacEmail(selledBuyerEmail(buyerName,buyerEmail))
       }
     };
   
