@@ -1,8 +1,10 @@
+const { all } = require('axios')
 const Conversation = require('../models/conversation.model')
 const Message = require('../models/message.model')
 
 const newMessage = async (req,res) => {
 
+    console.log("SE ACCEDE A NEW MESSAGE")
     try {
         const existingConversation = await Conversation.findOne({
             $or: [
@@ -63,44 +65,36 @@ const getMessages = async (req,res) => {
             }
         ]
     }).populate( 'interlocutor1', ["username", "avatar_image"]).populate( 'interlocutor2', ["username", "avatar_image"])
-
-//     .populate({
-//         path    : 'users',
-//         populate: [
-//             { path: 'cars' },
-//             { path: 'houses' }
-//         ]
-//    });
-
-
-    console.log("las conversaciones con el username son", userConversations)
     
+    // console.log("La user conver es", userMessagesData2)
+
     const allMessages = []
     const promises = userConversations.map(async (conversation) => {
         const messages = await Message.find({conversation_id: conversation._id})
-        allMessages.push(messages)
+        const messagesSorted = messages.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt))
+        allMessages.push(messagesSorted)
     })
     await Promise.allSettled(promises)
 
-    // let unreadConversationsCount = 0
-    const userMessagesData = userConversations.map((conversation, index) => {
-        // let allMessagesRead = true
-        // const relatedMessages = allMessages[index]
-        // relatedMessages.forEach(message => !message.read ? allMessagesRead = false : null)
-        const conversationAndMessages = {
-            conversation,
-            messages: allMessages[index],
-            // read: allMessagesRead,
+    let userMessagesData = []
+    for(let i = 0; i < userConversations.length; i++) {
+        for(const messages of allMessages) {
+            console.log("El id de la conver es", userConversations[i]._id ,"y el de los mensajes es:", messages[0].conversation_id)
+            if (userConversations[i]._id.equals(messages[0].conversation_id)) {
+                console.log("SE ACCEDE AL IF")
+                userMessagesData.push({
+                    conversation: userConversations[i],
+                    messages: messages,
+                })
+            }
         }
-        // !conversationAndMessages.read ? unreadConversationsCount++ : null
-        console.log("conversación completa", conversationAndMessages)
-        return conversationAndMessages
-    })
+    }
     
     const allUserData = {
         userData: req.userData, 
         userMessagesData,
         }
+
     res.status(200).send(allUserData)
 
     } catch(err) {
