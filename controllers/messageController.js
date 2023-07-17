@@ -79,9 +79,7 @@ const getMessages = async (req,res) => {
     let userMessagesData = []
     for(let i = 0; i < userConversations.length; i++) {
         for(const messages of allMessages) {
-            console.log("El id de la conver es", userConversations[i]._id ,"y el de los mensajes es:", messages[0].conversation_id)
             if (userConversations[i]._id.equals(messages[0].conversation_id)) {
-                console.log("SE ACCEDE AL IF")
                 userMessagesData.push({
                     conversation: userConversations[i],
                     messages: messages,
@@ -103,4 +101,31 @@ const getMessages = async (req,res) => {
     }
 }
 
-module.exports = { newMessage, getMessages }
+const updateMessages = async (req,res) => {
+    try {
+        console.log("Se accede a upsate messages y la data del decodedToken es: \n", req.decodedToken)
+        const messages = await Message.find({
+            conversation_id: req.body.conversation_id,
+            sender: { $ne : req.decodedToken.id }
+        })
+        const promises = messages.map(async message => {
+            console.log(message.message)
+
+            await Message.updateOne(
+              { _id: message._id },
+              {
+                $set: {
+                  read: true,
+                },
+              }
+            )
+        })
+        await Promise.allSettled(promises)
+        res.status(200).send({message: "Mensajes marcados como leídos correctamente"})
+    } catch (err) {
+        console.log(err)
+        res.status(400).send({error: "Ha habido un error al marcar los mensajes como leídos"})
+    }
+}
+
+module.exports = { newMessage, getMessages, updateMessages }

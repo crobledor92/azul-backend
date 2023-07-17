@@ -11,7 +11,7 @@ const UserSchema = new Schema({
     address: {type: String},
     email: {type: String, required: true, unique: true, trim: true},
     phone: {type: Number},
-    avatar_image:  {type: String},
+    avatar_image:  {type: String, default: "https://cdn-icons-png.flaticon.com/512/6596/6596121.png"},
     username: {type: String, required: true, unique: true, trim: true},
     password: {type: String, required: true},
     deletedAt: {type: Date},
