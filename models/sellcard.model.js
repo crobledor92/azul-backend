@@ -27,6 +27,8 @@ const sellCardSchema = new Schema({
         bid_date: {type: Date},
     }],
     expired: {type: Boolean, required: false},
+    deletedAt: {type: Date, required: false},
+
 
 
 },

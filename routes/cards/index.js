@@ -1,7 +1,7 @@
 const express = require('express');
 const cardsRouter = express.Router();
 const { tokenValidator } = require("../../middlewares/tokenValidator");
-const { createAllCardsSummary, getCardDetail, getRandomCards, getSearchedCards, putOnSell, getCardsOnSell, getCardsInCollections, buyCard, onCartCard, bidUpCard, buyCardsOnCart, deleteCardFromCart, getEndOfBidCards} = require('../../controllers/cardController');
+const { createAllCardsSummary, getCardDetail, getRandomCards, getSearchedCards, putOnSell, getCardsOnSell, getCardsInCollections, buyCard, onCartCard, bidUpCard, buyCardsOnCart, deleteCardFromCart, getEndOfBidCards, delCard} = require('../../controllers/cardController');
 
 const Card = require('../../models/card.model');
 
@@ -25,6 +25,8 @@ cardsRouter.put('/buyCardsOnCart', tokenValidator, buyCardsOnCart)
 cardsRouter.get ('/cardcollections', getCardsInCollections)
 
 cardsRouter.get('/endOfBid', getEndOfBidCards);
+
+cardsRouter.post('/delcard', tokenValidator, delCard)
 
 cardsRouter.get('/:cardId', getCardDetail)
 

@@ -313,6 +313,7 @@ const getSearchedCards = async function (req, res, next) {
         { buyer: { $exists: true } },
         { on_cart: { $exists: true } },
         { expired: { $exists: true } },
+        { deletedAt: { $exists: true } },
 
       ] }
       ]
@@ -379,8 +380,31 @@ const getSearchedCards = async function (req, res, next) {
   
     res.status(200).send(matchingCards);
   };
+
+  const delCard = (req, res) => {
+    const currentDate = new Date();
+    const delCardData = req.body;
+    const cardId = new ObjectId(delCardData._id); // Convertir a ObjectId  
+
+    //db.collection('sellcards').deleteOne({ _id: cardId })
+    sellCard.updateOne(
+      { _id: cardId },
+      {
+        $set: {
+          deletedAt: currentDate,
+        },
+      }
+    )
+     .then(() => {
+        res.send("ok");
+      })
+      .catch((error) => {
+        console.log("Error al actualizar la carta:", error);
+        res.status(500).send("Error al actualizar la carta");
+      });
+  };
   
 
-module.exports = { createAllCardsSummary, getCardDetail, getRandomCards, getSearchedCards, putOnSell, getCardsOnSell, getCardsInCollections, buyCard, onCartCard, bidUpCard, buyCardsOnCart, deleteCardFromCart, getEndOfBidCards}
+module.exports = { createAllCardsSummary, getCardDetail, getRandomCards, getSearchedCards, putOnSell, getCardsOnSell, getCardsInCollections, buyCard, onCartCard, bidUpCard, buyCardsOnCart, deleteCardFromCart, getEndOfBidCards, delCard}
 
 
