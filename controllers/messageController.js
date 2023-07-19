@@ -4,7 +4,6 @@ const Message = require('../models/message.model')
 
 const newMessage = async (req,res) => {
 
-    console.log("SE ACCEDE A NEW MESSAGE")
     try {
         const existingConversation = await Conversation.findOne({
             $or: [
@@ -66,7 +65,7 @@ const getMessages = async (req,res) => {
         ]
     }).populate( 'interlocutor1', ["username", "avatar_image"]).populate( 'interlocutor2', ["username", "avatar_image"])
     
-    // console.log("La user conver es", userMessagesData2)
+
 
     const allMessages = []
     const promises = userConversations.map(async (conversation) => {
@@ -103,14 +102,11 @@ const getMessages = async (req,res) => {
 
 const updateMessages = async (req,res) => {
     try {
-        console.log("Se accede a upsate messages y la data del decodedToken es: \n", req.decodedToken)
         const messages = await Message.find({
             conversation_id: req.body.conversation_id,
             sender: { $ne : req.decodedToken.id }
         })
         const promises = messages.map(async message => {
-            console.log(message.message)
-
             await Message.updateOne(
               { _id: message._id },
               {
