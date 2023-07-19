@@ -1,10 +1,9 @@
 const { server } = require('../app')
 const { Server } = require("socket.io");
-const axios =require ('axios')
-const mongoose = require('mongoose');
 const User = require('../models/user.model')
 const Conversation = require('../models/conversation.model')
 const Message = require('../models/message.model')
+const { getUserMessagesData, getConversation, addNewMessage, markAsRead } = require('./socketQuerys')
 
 const websocket = () => {
     const io = new Server(server, {
@@ -18,28 +17,36 @@ const websocket = () => {
         io.emit("message", "bienvenido de nuevo")
         socket.on("id", async (id) => {
             try {
-                let userConversations = await Conversation.find({
-                    $or: [
-                        {
-                            interlocutor1: id,
-                        },
-                        {
-                            interlocutor2: id,
-                        }
-                    ]
-                })
-                io.emit(`inbox_${id}`, {inbox: userConversations})
-                for(const conversation of userConversations) {
-                    socket.on(`${conversation._id}`, (message) => {
-
-                        io.emit(`${conversation._id}`, message.text)
-                    })
-                }
-                // console.log("Las conversaciones son", userConversations)
+                const userMessagesData = await getUserMessagesData(id)
+                io.emit(`inbox_${id}`, {userMessagesData})
             } catch(err) {
                 console.log(err)
             }
         });
+        socket.on("message", async (message) => {
+            try {
+                const conversation = await getConversation(message)
+                await addNewMessage(message, conversation)
+                const senderMessagesData = await getUserMessagesData(message.sender_id)
+                io.emit(`inbox_${message.sender_id}`, {userMessagesData: senderMessagesData})
+                const receiverMessagesData = await getUserMessagesData(message.receiver_id)
+                io.emit(`inbox_${message.receiver_id}`, {userMessagesData: receiverMessagesData})
+            } catch(err) {
+                console.log(err)
+            }
+        })
+        socket.on("conversationRead", async (conversation) => {
+            console.log("el socket recibe la conversación a actualizar", conversation)
+            try {
+                const senderUserId = await markAsRead(conversation)
+                const readerMessagesData = await getUserMessagesData(conversation.reader_id)
+                io.emit(`inbox_${conversation.reader_id}`, {userMessagesData: readerMessagesData})
+                const senderMessagesData = await getUserMessagesData(senderUserId)
+                io.emit(`inbox_${senderUserId}`, {userMessagesData: senderMessagesData})
+            } catch (err) {
+                console.log(err)
+            }
+        })
     })
 }
 
