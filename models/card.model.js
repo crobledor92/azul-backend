@@ -33,15 +33,6 @@ const cardSchema = new Schema({
     rarity: {type: String},
     artist: {type: String},
 
-    /* All these come from the user when puts a card on sell. */
-    // lang: {type: String, required: true},
-    // foil: {type: Boolean, required: true},
-    // status: {type: String, required: true},
-    // type_sell: {type: String, required: true},
-    // price: {type: String, required: true},
-    // end_of_bid: {type: Date, required: false},
-    // user: {type: String, required: true},
-    // set_id: {type: String, required: true},
 },
     {timestamps: true}
 );

@@ -1,9 +1,18 @@
-require('dotenv').config()
-const express = require('express')
-const cors = require('cors');
-const app = express()
-
 //importamos dotenv para poder gestionar el puerto del backend con variable de entorno
+require('dotenv').config()
+
+const express = require('express')
+const app = express();
+const http = require('http');
+const server = http.createServer(app);
+module.exports = { server }
+
+const cors = require('cors');
+
+
+//importamos la función que crea el socket y la ejecutamos
+const { websocket } = require('./websocket')
+websocket()
 
 const port = process.env.PORT || 5000;
 const axios = require('axios')
@@ -23,9 +32,7 @@ app.use(express.json())
 const generalRouter = require('./routes')
 app.use(generalRouter)
 
-
-
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
 
