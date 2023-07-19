@@ -14,7 +14,7 @@ const cors = require('cors');
 const { websocket } = require('./websocket')
 websocket()
 
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || '0.0.0.0:$PORT';
 const axios = require('axios')
 
 //importamos función conexión a mongo y la ejecutamos
