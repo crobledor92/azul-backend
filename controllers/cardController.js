@@ -403,8 +403,8 @@ const getSearchedCards = async function (req, res, next) {
         res.status(500).send("Error al actualizar la carta");
       });
   };
-  
 
+  
 module.exports = { createAllCardsSummary, getCardDetail, getRandomCards, getSearchedCards, putOnSell, getCardsOnSell, getCardsInCollections, buyCard, onCartCard, bidUpCard, buyCardsOnCart, deleteCardFromCart, getEndOfBidCards, delCard}
 
 
