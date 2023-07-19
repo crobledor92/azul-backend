@@ -34,6 +34,8 @@ const getUserMessagesData = async (id) => {
         }
     }
 
+    userMessagesData = userMessagesData.sort((a,b) => b.messages[0].createdAt - a.messages[0].createdAt)
+    
     return userMessagesData
 }
 
