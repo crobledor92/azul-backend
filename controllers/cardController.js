@@ -194,6 +194,13 @@ const getSearchedCards = async function (req, res, next) {
         },
       }
     )
+     .then(async () => {
+      const populatedCard = await sellCard.findById(cardId).populate('user');
+      const userEmail = populatedCard.user.email;
+      const userName = populatedCard.user.username;
+      SibApiV3Sdk.ApiClient.instance.authentications['api-key'].apiKey = process.env.BREVO_API_DAVID;
+      new SibApiV3Sdk.TransactionalEmailsApi().sendTransacEmail(selledSellerEmail(userName,userEmail))
+      })
      .then(() => {
         res.send("ok");
       })
