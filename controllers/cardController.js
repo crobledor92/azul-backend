@@ -306,6 +306,7 @@ const getSearchedCards = async function (req, res, next) {
 
   const getCardsOnSell = async function (req, res, next) {
     const input = req.query.name;
+    console.log ("input es", input)
     const matchingCards = await sellCard.find({  
       $and: [
       { name: input },
@@ -320,6 +321,25 @@ const getSearchedCards = async function (req, res, next) {
   }).populate("user", "username");
     res.status(200).send(matchingCards);
   } 
+
+   const getAllOnSell = async function (req, res) {
+     const matchingCards = await sellCard.find({
+       $and: [
+         //{ name: "Riddlesmith" },
+         {  $nor: [
+           { buyer: { $exists: true } },
+           { on_cart: { $exists: true } },
+           { expired: { $exists: true } },
+           { deletedAt: { $exists: true } },
+         ] }
+         ]
+     }).populate("user", "username");
+     //console.log("matchin es:",matchingCards)
+     res.status(200).send(matchingCards);
+   };
+  
+  
+  
 
 
   ///////OBTENEMOS LAS CARTAS EXPIRADAS***** 
@@ -405,6 +425,6 @@ const getSearchedCards = async function (req, res, next) {
   };
 
   
-module.exports = { createAllCardsSummary, getCardDetail, getRandomCards, getSearchedCards, putOnSell, getCardsOnSell, getCardsInCollections, buyCard, onCartCard, bidUpCard, buyCardsOnCart, deleteCardFromCart, getEndOfBidCards, delCard}
+module.exports = { createAllCardsSummary, getCardDetail, getRandomCards, getSearchedCards, putOnSell, getCardsOnSell, getCardsInCollections, buyCard, onCartCard, bidUpCard, buyCardsOnCart, deleteCardFromCart, getEndOfBidCards, delCard, getAllOnSell}
 
 
