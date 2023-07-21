@@ -6,7 +6,7 @@ const { createAllCardsSummary, getCardDetail, getRandomCards, getSearchedCards, 
 const Card = require('../../models/card.model');
 
 
-cardsRouter.post('/addAllCards', createAllCardsSummary);
+// cardsRouter.post('/addAllCards', createAllCardsSummary);
 
 cardsRouter.get('/search', getSearchedCards);
 
